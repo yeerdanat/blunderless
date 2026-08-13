@@ -7,6 +7,22 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: blunderless
+          POSTGRES_PASSWORD: blunderless
+          POSTGRES_DB: blunderless
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U blunderless"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://blunderless:blunderless@localhost:5432/blunderless
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
