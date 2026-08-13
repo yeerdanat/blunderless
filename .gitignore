@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Data artifacts (Lichess dumps, puzzle CSVs, engine books)
+data/
+*.pgn.zst
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
