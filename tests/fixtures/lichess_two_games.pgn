@@ -1,0 +1,31 @@
+[Event "Rated blitz game"]
+[Site "https://lichess.org/abcd1234"]
+[Date "2026.07.01"]
+[White "yerdanat"]
+[Black "opponent1"]
+[Result "1-0"]
+[UTCDate "2026.07.01"]
+[UTCTime "18:30:00"]
+[WhiteElo "1480"]
+[BlackElo "1455"]
+[TimeControl "300+3"]
+[ECO "B01"]
+[Termination "Normal"]
+
+1. e4 { [%clk 0:05:00] } d5 { [%clk 0:05:00] } 2. exd5 { [%clk 0:04:58] } Qxd5 { [%clk 0:04:57] } 3. Nc3 { [%clk 0:04:55] } Qa5 { [%clk 0:04:50] } 1-0
+
+[Event "Rated blitz game"]
+[Site "https://lichess.org/efgh5678"]
+[Date "2026.07.02"]
+[White "opponent2"]
+[Black "yerdanat"]
+[Result "1-0"]
+[UTCDate "2026.07.02"]
+[UTCTime "19:00:00"]
+[WhiteElo "1502"]
+[BlackElo "1478"]
+[TimeControl "300+3"]
+[ECO "C50"]
+[Termination "Normal"]
+
+1. e4 { [%clk 0:05:00] } e5 { [%clk 0:05:00] } 2. Nf3 { [%clk 0:04:59] } Nc6 { [%clk 0:04:58] } 3. Bc4 { [%clk 0:04:57] } Bc5 { [%clk 0:04:55] } 1-0
