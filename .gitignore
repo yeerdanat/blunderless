@@ -20,9 +20,15 @@ htmlcov/
 .env.*
 !.env.example
 
-# Data artifacts (Lichess dumps, puzzle CSVs, engine books)
-data/
+# Data artifacts (Lichess dumps, puzzle CSVs, cohort samples) —
+# except the small opening-book TSVs, which tests depend on
+data/*
+!data/openings/
 *.pgn.zst
+
+# Frontend
+node_modules/
+frontend/dist/
 
 # OS / editor
 .DS_Store
