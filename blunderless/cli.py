@@ -42,6 +42,8 @@ def main() -> None:
     holdout.add_argument("platform", choices=["lichess", "chesscom"])
     holdout.add_argument("username")
 
+    sub.add_parser("puzzle-index", help="build the puzzle theme index")
+
     args = parser.parse_args()
     if args.command == "sync":
         stats = sync_player(
@@ -139,6 +141,10 @@ def main() -> None:
                 f"logloss_profile={result.logloss_profile:.5f} "
                 f"improvement={result.improvement_pct:.2f}%"
             )
+    elif args.command == "puzzle-index":
+        from blunderless.puzzles import build_index
+
+        print(build_index())
 
 
 if __name__ == "__main__":

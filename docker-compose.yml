@@ -25,12 +25,30 @@ services:
       timeout: 3s
       retries: 10
 
+  api:
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+    command: uvicorn blunderless.api.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://blunderless:blunderless@postgres:5432/blunderless
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   worker:
     build:
       context: .
       dockerfile: docker/worker.Dockerfile
     environment:
-      DATABASE_URL: postgresql://blunderless:blunderless@postgres:5432/blunderless
+      DATABASE_URL: postgresql+psycopg://blunderless:blunderless@postgres:5432/blunderless
       REDIS_URL: redis://redis:6379/0
     depends_on:
       postgres:
