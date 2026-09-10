@@ -24,6 +24,10 @@ def main() -> None:
         help="disable two-pass tiering (benchmark baseline: deep MultiPV everywhere)",
     )
 
+    motifs = sub.add_parser("motifs", help="tag classified errors with tactical motifs")
+    motifs.add_argument("platform", choices=["lichess", "chesscom"])
+    motifs.add_argument("username")
+
     args = parser.parse_args()
     if args.command == "sync":
         stats = sync_player(
@@ -60,6 +64,20 @@ def main() -> None:
             f"cache_hits={total.cache_hits} ({cached_pct:.1f}%) "
             f"control={total.control_samples}"
         )
+    elif args.command == "motifs":
+        from sqlalchemy import select
+
+        from blunderless.analysis.tag_motifs import tag_player_motifs
+        from blunderless.db.models import Player
+
+        with make_session_factory()() as db:
+            player = db.execute(
+                select(Player).where(
+                    Player.platform == args.platform, Player.username == args.username
+                )
+            ).scalar_one()
+            written = tag_player_motifs(db, player.id)
+        print(f"motif_rows={written}")
 
 
 if __name__ == "__main__":
