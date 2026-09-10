@@ -28,6 +28,20 @@ def main() -> None:
     motifs.add_argument("platform", choices=["lichess", "chesscom"])
     motifs.add_argument("username")
 
+    baseline = sub.add_parser("baseline", help="build cohort baselines from the dump sample")
+    baseline.add_argument("--workers", type=int, default=6)
+    baseline.add_argument("--games-per-cell", type=int, default=None)
+    baseline.add_argument("--no-motifs", action="store_true")
+    baseline.add_argument("--cells", default=None, help="comma-separated cell names to build")
+
+    weakness = sub.add_parser("weakness", help="compute weaknesses vs cohort baselines")
+    weakness.add_argument("platform", choices=["lichess", "chesscom"])
+    weakness.add_argument("username")
+
+    holdout = sub.add_parser("holdout", help="chronological holdout validation")
+    holdout.add_argument("platform", choices=["lichess", "chesscom"])
+    holdout.add_argument("username")
+
     args = parser.parse_args()
     if args.command == "sync":
         stats = sync_player(
@@ -78,6 +92,53 @@ def main() -> None:
             ).scalar_one()
             written = tag_player_motifs(db, player.id)
         print(f"motif_rows={written}")
+    elif args.command == "baseline":
+        from blunderless.cohort.runner import build_all
+
+        results = build_all(
+            workers=args.workers,
+            games_per_cell=args.games_per_cell,
+            with_motifs=not args.no_motifs,
+            cells=args.cells.split(",") if args.cells else None,
+        )
+        print(results)
+    elif args.command == "weakness":
+        from sqlalchemy import select
+
+        from blunderless.db.models import Player
+        from blunderless.stats.weakness import compute_weaknesses
+
+        with make_session_factory()() as db:
+            player = db.execute(
+                select(Player).where(
+                    Player.platform == args.platform, Player.username == args.username
+                )
+            ).scalar_one()
+            written = compute_weaknesses(db, player)
+        print(f"weakness_rows={written}")
+    elif args.command == "holdout":
+        from sqlalchemy import select
+
+        from blunderless.db.models import Player
+        from blunderless.stats.holdout import evaluate_holdout
+
+        with make_session_factory()() as db:
+            player = db.execute(
+                select(Player).where(
+                    Player.platform == args.platform, Player.username == args.username
+                )
+            ).scalar_one()
+            result = evaluate_holdout(db, player.id)
+        if result is None:
+            print("not enough games for holdout")
+        else:
+            print(
+                f"train_moves={result.n_train_moves} test_moves={result.n_test_moves} "
+                f"test_error_rate={result.test_error_rate:.4f} "
+                f"logloss_cohort={result.logloss_cohort:.5f} "
+                f"logloss_profile={result.logloss_profile:.5f} "
+                f"improvement={result.improvement_pct:.2f}%"
+            )
 
 
 if __name__ == "__main__":
