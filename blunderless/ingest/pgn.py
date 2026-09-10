@@ -49,10 +49,16 @@ class GameRecord:
     pgn: str
 
 
-def _game_id_from_url(url: str) -> str | None:
+def _game_id_from_url(*candidates: str) -> str | None:
     # https://lichess.org/AbCdEfGh  /  https://www.chess.com/game/live/123456
-    tail = url.rstrip("/").rsplit("/", 1)[-1]
-    return tail or None
+    # Chess.com puts a bare "Chess.com" in Site and the game URL in Link,
+    # so only values that are actually URLs count.
+    for url in candidates:
+        if "://" in url:
+            tail = url.rstrip("/").rsplit("/", 1)[-1]
+            if tail:
+                return tail
+    return None
 
 
 def _parse_played_at(headers: chess.pgn.Headers) -> datetime | None:
@@ -91,7 +97,7 @@ def normalize_pgn(pgn: str, platform: str, username: str) -> GameRecord | None:
     else:
         return None
 
-    game_id = _game_id_from_url(headers.get("Site", "") or headers.get("Link", ""))
+    game_id = _game_id_from_url(headers.get("Site", ""), headers.get("Link", ""))
     if not game_id:
         return None
 
